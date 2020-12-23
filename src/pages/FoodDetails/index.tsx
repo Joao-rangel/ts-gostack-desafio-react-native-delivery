@@ -98,12 +98,16 @@ const FoodDetails: React.FC = () => {
     // Decrement food quantity
   }
 
-  const toggleFavorite = useCallback(() => {
+  const toggleFavorite = useCallback(async () => {
+    setIsFavorite(!isFavorite);
+
+    if (isFavorite) await api.post('/favorites', food);
     // Toggle if food is favorite or not
   }, [isFavorite, food]);
 
   const cartTotal = useMemo(() => {
     // Calculate cartTotal
+    return formatValue(999); // TODO implement
   }, [extras, food, foodQuantity]);
 
   async function handleFinishOrder(): Promise<void> {
