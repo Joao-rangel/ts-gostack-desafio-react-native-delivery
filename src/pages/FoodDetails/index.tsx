@@ -73,14 +73,21 @@ const FoodDetails: React.FC = () => {
 
   useEffect(() => {
     async function loadFood(): Promise<void> {
-      await api.get<Food>(`/foods/${routeParams.id}`).then(response => {
-        setFood(response.data);
-        setExtras(response.data.extras);
+      await api.get<Food>(`/foods/${routeParams.id}`).then(({ data }) => {
+        setFood({ ...data, formattedPrice: formatValue(data.price) });
+        setExtras(data.extras);
       });
     }
-
+    async function favoriteCheck(): Promise<void> {
+      await api.get<Food[]>('/favorites').then(({ data }) => {
+        data.forEach(({ id }) => {
+          if (id === food.id) setIsFavorite(true);
+        });
+      });
+    }
     loadFood();
-  }, [routeParams]);
+    favoriteCheck();
+  }, [food.id, routeParams]);
 
   function handleIncrementExtra(id: number): void {
     // Increment extra quantity
@@ -99,10 +106,10 @@ const FoodDetails: React.FC = () => {
   }
 
   const toggleFavorite = useCallback(async () => {
-    setIsFavorite(!isFavorite);
+    if (!isFavorite) await api.post('/favorites', food);
+    if (isFavorite) await api.delete(`/favorites/${food.id}`);
 
-    if (isFavorite) await api.post('/favorites', food);
-    // Toggle if food is favorite or not
+    setIsFavorite(!isFavorite);
   }, [isFavorite, food]);
 
   const cartTotal = useMemo(() => {
