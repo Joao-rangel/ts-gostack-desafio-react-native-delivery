@@ -103,9 +103,8 @@ const FoodDetails: React.FC = () => {
     setExtras(extraList =>
       extraList.map(extra => {
         if (extra.id !== id) return extra;
-
-        const quantity = extra.quantity > 0 ? extra.quantity - 1 : 0;
-        return { ...extra, quantity };
+        if (extra.quantity === 0) return extra;
+        return { ...extra, quantity: extra.quantity - 1 };
       }),
     );
   }
@@ -115,7 +114,7 @@ const FoodDetails: React.FC = () => {
   }
 
   function handleDecrementFood(): void {
-    setFoodQuantity(quantity => (quantity > 0 ? quantity - 1 : 0));
+    setFoodQuantity(quantity => (quantity > 1 ? quantity - 1 : 1));
   }
 
   const toggleFavorite = useCallback(async () => {
